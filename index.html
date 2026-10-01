@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -9,42 +9,43 @@
 </head>
 
 <body>
-    <div class="container-fluid">
+    <div class="container-fluid mt-3">
+        <!-- SECCIÓN 1: GESTIÓN DE CLIENTES -->
         <div class="row">
             <div class="col-6">
                 <form id="frmCliente">
                     <div class="container text-center">
-                        <div class="row">
+                        <div class="row mb-2">
                             <div class="col">
-                                <input pattern="^[0-9]{3,10}$" required placeholder="Codigo" name="txtCodigoCliente"
-                                    id="txtCodigoCliente" class="form-control" type="text">
+                                <h4>REGISTRO DE CLIENTES</h4>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row mb-2">
                             <div class="col">
-                                <input pattern="^[A-Za-záéíóúÁÉÍÓÚñÑ ]{3,}$" required placeholder="Nombre"
-                                    name="txtNombreCliente" id="txtNombreCliente" class="form-control" type="text">
+                                <input pattern="^[0-9]{3,10}$" required placeholder="Codigo" name="txtCodigoCliente" id="txtCodigoCliente" class="form-control" type="text">
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row mb-2">
                             <div class="col">
-                                <input placeholder="Direccion" name="txtDireccionCliente" id="txtDireccionCliente"
-                                    class="form-control" type="text">
+                                <input pattern="^[A-Za-záéíóúÁÉÍÓÚñÑ ]{3,}$" required placeholder="Nombre" name="txtNombreCliente" id="txtNombreCliente" class="form-control" type="text">
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row mb-2">
                             <div class="col">
-                                <input pattern="^[0-9]{4}-[0-9]{4}$" placeholder="Telefono" name="txtTelefonoCliente"
-                                    id="txtTelefonoCliente" class="form-control" type="text">
+                                <input placeholder="Direccion" name="txtDireccionCliente" id="txtDireccionCliente" class="form-control" type="text">
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row mb-2">
                             <div class="col">
-                                <input placeholder="Email" name="txtEmailCliente" id="txtEmailCliente"
-                                    class="form-control" type="email">
+                                <input pattern="^[0-9]{4}-[0-9]{4}$" placeholder="Telefono (ej. 1234-5678)" name="txtTelefonoCliente" id="txtTelefonoCliente" class="form-control" type="text">
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row mb-2">
+                            <div class="col">
+                                <input placeholder="Email" name="txtEmailCliente" id="txtEmailCliente" class="form-control" type="email">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
                             <div class="col">
                                 <select class="form-control" name="cboTipoPersona" id="cboTipoPersona">
                                     <option value="particular">Particular</option>
@@ -54,19 +55,19 @@
                         </div>
                         <div class="row">
                             <div class="col">
-                                <input type="submit" value="Guardar" class="btn btn-primary">
-                                <input type="button" value="Buscar" class="btn btn-secondary">
+                                <input type="submit" value="Guardar" class="btn btn-primary" id="btnGuardarCliente">
                                 <input type="reset" value="Limpiar" class="btn btn-warning">
                             </div>
                         </div>
                     </div>
                 </form>
             </div>
+            
             <div class="col-6">
                 <form id="frmConsultarCliente">
                     <div class="container text-center">
-                        <div class="row">
-                            <div class="col">BUSQUEDA DE CLIENTES</div>
+                        <div class="row mb-2">
+                            <div class="col"><h4>BÚSQUEDA DE CLIENTES</h4></div>
                         </div>
                         <div class="row">
                             <div class="col">
@@ -75,9 +76,7 @@
                                         <thead>
                                             <tr>
                                                 <th colspan="7">
-                                                    <input type="search" placeholder="buscar por codigo, nombre"
-                                                        id="txtBuscarCliente" name="txtBuscarCliente"
-                                                        class="form-control">
+                                                    <input type="search" placeholder="Buscar por código o nombre..." id="txtBuscarCliente" name="txtBuscarCliente" class="form-control">
                                                 </th>
                                             </tr>
                                             <tr>
@@ -99,107 +98,278 @@
                 </form>
             </div>
         </div>
+
+        <hr class="my-4">
+
+        <!-- SECCIÓN 2: GESTIÓN DE IMPUESTOS -->
+        <div class="row mt-4 mb-5">
+            <div class="col-12 text-center mb-3">
+                <h3>GESTIÓN DE IMPUESTOS A ACTIVIDADES ECONÓMICAS</h3>
+                <p id="lblAvisoImpuesto" class="text-secondary">Selecciona un cliente de la tabla superior para administrar sus impuestos.</p>
+            </div>
+            
+            <!-- Este formulario estará oculto hasta que se seleccione una EMPRESA -->
+            <div class="col-6 offset-3" id="contenedorImpuestos" style="display: none;">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0" id="lblNombreEmpresa"></h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="frmImpuesto">
+                            <input type="hidden" id="txtIdClienteImpuesto">
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Producto Aplicable</label>
+                                <select id="cboProducto" class="form-control">
+                                    <option value="11801">Comercio (11801)</option>
+                                    <option value="11802">Industria (11802)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <label class="form-label">Desde (Incluido)</label>
+                                    <input type="date" required id="txtDesde" class="form-control">
+                                </div>
+                                <div class="col">
+                                    <label class="form-label">Hasta (Excluido)</label>
+                                    <input type="date" required id="txtHasta" class="form-control">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Balance o Activo Declarado ($)</label>
+                                <input type="number" step="0.01" required id="txtBalance" class="form-control" placeholder="0.00">
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <strong>Impuesto Mensual Calculado: </strong>$<span id="lblPrecioCalculado">0.00</span>
+                            </div>
+                            
+                            <div class="text-center">
+                                <input type="submit" value="Guardar Período de Impuesto" class="btn btn-success">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</body>
-<script>
-    var accion = 'nuevo',
-        idCliente = '';
 
-    frmCliente.addEventListener('submit', (e) => {
-        e.preventDefault();
-        guardarClientes();
+    <script>
+        // VARIABLES GLOBALES PARA CLIENTES
+        var accion = 'nuevo',
+            idCliente = '';
 
-    });
-    frmCliente.addEventListener('reset', (e) => {
-        e.preventDefault();
-        limpiarFormulario();
-    });
-    txtBuscarCliente.addEventListener('keyup', (e) => {
-        e.preventDefault();
-        obtenerClientes(txtBuscarCliente.value);
-    });
-    document.addEventListener("DOMContentLoaded", obtenerClientes);
+        // EVENTOS CLIENTES
+        frmCliente.addEventListener('submit', (e) => {
+            e.preventDefault();
+            guardarClientes();
+        });
 
-    async function obtenerClientes(buscar = "") {
-        let response = await fetch(`/clientes?buscar=${buscar}`),
-            datos = await response.json();
-        mostrarDatos(datos);
-    }
-    function mostrarDatos(datos) {
-        let filas = "";
-        datos.forEach(e => {
-            filas += `
-                <tr onClick='modificarCliente(${JSON.stringify(e)}, event)'>
+        frmCliente.addEventListener('reset', (e) => {
+            e.preventDefault();
+            limpiarFormulario();
+        });
+
+        txtBuscarCliente.addEventListener('keyup', (e) => {
+            e.preventDefault();
+            obtenerClientes(txtBuscarCliente.value);
+        });
+
+        document.addEventListener("DOMContentLoaded", obtenerClientes);
+
+        // FUNCIONES CLIENTES
+        async function obtenerClientes(buscar = "") {
+            let response = await fetch(`/clientes?buscar=${buscar}`);
+            let datos = await response.json();
+            mostrarDatos(datos);
+        }
+
+        function mostrarDatos(datos) {
+            let filas = "";
+            datos.forEach(e => {
+                filas += `
+                <tr style="cursor: pointer;" onClick='modificarCliente(${JSON.stringify(e)}, event)'>
                     <td>${e.codigo}</td>
                     <td>${e.nombre}</td>
                     <td>${e.direccion}</td>
                     <td>${e.telefono}</td>
                     <td>${e.email}</td>
-                    <td>${e.tipo}</td>
+                    <td><span class="badge ${e.tipo === 'empresa' ? 'bg-success' : 'bg-secondary'}">${e.tipo}</span></td>
                     <td>
                         <input onClick='eliminarCliente(${JSON.stringify(e)}, event)' 
-                            type="button" value="DEL" class="btn btn-danger"/>
+                            type="button" value="DEL" class="btn btn-danger btn-sm"/>
                     </td>
                 </tr>
-            `;
-        });
-        tblClientes.innerHTML = filas;
-    }
-    function modificarCliente(data, event) {
-        event.preventDefault();
-        idCliente = data.idCliente;
-        accion = "modificar";
+                `;
+            });
+            tblClientes.innerHTML = filas;
+        }
 
-        txtCodigoCliente.value = data.codigo;
-        txtNombreCliente.value = data.nombre;
-        txtDireccionCliente.value = data.direccion;
-        txtTelefonoCliente.value = data.telefono;
-        txtEmailCliente.value = data.email;
-        cboTipoPersona.value = data.tipo;
-    }
-    function eliminarCliente(data, event) {
-        event.preventDefault();
-        if (confirm(`¿Seguro de eliminar al cliente: ${data.nombre}?`)) {
+        function modificarCliente(data, event) {
+            // Evitamos que se dispare si hicieron clic en el botón DEL
+            if(event.target.type === 'button') return; 
+
+            event.preventDefault();
+            
+            // 1. Cargar datos en el formulario y cambiar a modo edición
             idCliente = data.idCliente;
-            accion = "eliminar";
-            guardarClientes();
-        }
-    }
-    async function guardarClientes() {
-        let datos = {
-            codigo: txtCodigoCliente.value,
-            nombre: txtNombreCliente.value,
-            direccion: txtDireccionCliente.value,
-            telefono: txtTelefonoCliente.value,
-            email: txtEmailCliente.value,
-            tipo: cboTipoPersona.value,
-            accion,
-            idCliente
-        };
-        let response = await fetch('/cliente', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(datos)
-        }), respuesta = await response.json();
-        if (respuesta.msg != "ok") {
-            alert("Error: " + respuesta.msg);
-            return;
-        }
-        obtenerClientes();
-        limpiarFormulario();
-    }
-    function limpiarFormulario() {
-        accion = 'nuevo';
-        idCliente = '';
-        txtCodigoCliente.value = '';
-        txtNombreCliente.value = '';
-        txtDireccionCliente.value = '';
-        txtTelefonoCliente.value = '';
-        txtEmailCliente.value = '';
-        cboTipoPersona.value = 'particular';
-    }
-</script>
+            accion = "modificar";
+            txtCodigoCliente.value = data.codigo;
+            txtNombreCliente.value = data.nombre;
+            txtDireccionCliente.value = data.direccion;
+            txtTelefonoCliente.value = data.telefono;
+            txtEmailCliente.value = data.email;
+            cboTipoPersona.value = data.tipo;
 
+            // CAMBIO VISUAL: Avisar que estamos actualizando, no creando
+            let btnSubmit = document.getElementById('btnGuardarCliente');
+            btnSubmit.value = "Actualizar Cliente";
+            btnSubmit.className = "btn btn-info fw-bold text-white";
+
+            // 2. Lógica para habilitar la sección de Impuestos
+            let contenedorImpuestos = document.getElementById('contenedorImpuestos');
+            let lblAvisoImpuesto = document.getElementById('lblAvisoImpuesto');
+            let lblNombreEmpresa = document.getElementById('lblNombreEmpresa');
+
+            if (data.tipo === 'empresa') {
+                contenedorImpuestos.style.display = 'block';
+                lblAvisoImpuesto.style.display = 'none';
+                lblNombreEmpresa.innerText = "Empresa: " + data.nombre;
+                document.getElementById('txtIdClienteImpuesto').value = data.idCliente;
+            } else {
+                contenedorImpuestos.style.display = 'none';
+                lblAvisoImpuesto.style.display = 'block';
+                lblAvisoImpuesto.className = 'text-danger fw-bold';
+                lblAvisoImpuesto.innerText = `El cliente '${data.nombre}' es Particular. El Impuesto a las Actividades Económicas requiere un cliente de tipo empresa.`;
+            }
+        }
+
+        function eliminarCliente(data, event) {
+            event.stopPropagation(); // Evita que se active el clic de la fila (modificarCliente)
+            if (confirm(`¿Seguro de eliminar al cliente: ${data.nombre}?`)) {
+                idCliente = data.idCliente;
+                accion = "eliminar";
+                guardarClientes();
+            }
+        }
+
+        async function guardarClientes() {
+            let datos = {
+                codigo: txtCodigoCliente.value,
+                nombre: txtNombreCliente.value,
+                direccion: txtDireccionCliente.value,
+                telefono: txtTelefonoCliente.value,
+                email: txtEmailCliente.value,
+                tipo: cboTipoPersona.value,
+                accion,
+                idCliente
+            };
+            let response = await fetch('/cliente', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
+            let respuesta = await response.json();
+            
+            if (respuesta.msg != "ok") {
+                alert("Error: " + respuesta.msg);
+                return;
+            }
+            obtenerClientes();
+            limpiarFormulario();
+        }
+
+        function limpiarFormulario() {
+            accion = 'nuevo';
+            idCliente = '';
+            txtCodigoCliente.value = '';
+            txtNombreCliente.value = '';
+            txtDireccionCliente.value = '';
+            txtTelefonoCliente.value = '';
+            txtEmailCliente.value = '';
+            cboTipoPersona.value = 'particular';
+            
+            // CAMBIO VISUAL: Restaurar el botón al modo "Nuevo"
+            let btnSubmit = document.getElementById('btnGuardarCliente');
+            btnSubmit.value = "Guardar";
+            btnSubmit.className = "btn btn-primary";
+
+            // Ocultar sección de impuestos al limpiar
+            document.getElementById('contenedorImpuestos').style.display = 'none';
+            let lblAvisoImpuesto = document.getElementById('lblAvisoImpuesto');
+            lblAvisoImpuesto.style.display = 'block';
+            lblAvisoImpuesto.className = 'text-secondary';
+            lblAvisoImpuesto.innerText = "Selecciona un cliente de la tabla superior para administrar sus impuestos.";
+        }
+
+        // ==========================================
+        // EVENTOS Y FUNCIONES PARA IMPUESTOS
+        // ==========================================
+
+        // Cálculo dinámico al escribir el balance
+        document.getElementById('txtBalance').addEventListener('keyup', async (e) => {
+            let balance = parseFloat(e.target.value);
+            let lblPrecioCalculado = document.getElementById('lblPrecioCalculado');
+            
+            if(balance > 0) {
+                let response = await fetch('/calcular', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({balance: balance})
+                });
+                let respuesta = await response.json();
+                
+                if(respuesta.error) {
+                    lblPrecioCalculado.innerText = "Error: " + respuesta.error;
+                    lblPrecioCalculado.className = "text-danger";
+                } else {
+                    lblPrecioCalculado.innerText = respuesta.precio_calculado;
+                    lblPrecioCalculado.className = "text-dark";
+                }
+            } else {
+                lblPrecioCalculado.innerText = "0.00";
+            }
+        });
+
+        // Guardar el período de impuesto
+        document.getElementById('frmImpuesto').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            let idCli = document.getElementById('txtIdClienteImpuesto').value;
+            let lblPrecioCalculado = document.getElementById('lblPrecioCalculado').innerText;
+
+            if (lblPrecioCalculado.includes("Error") || parseFloat(lblPrecioCalculado) <= 0) {
+                alert("Por favor, ingrese un balance válido que genere un impuesto correcto.");
+                return;
+            }
+
+            let datosImpuesto = {
+                idCliente: idCli,
+                producto: document.getElementById('cboProducto').value,
+                fecha_desde: document.getElementById('txtDesde').value,
+                fecha_hasta: document.getElementById('txtHasta').value,
+                balance: document.getElementById('txtBalance').value,
+                precio: parseFloat(lblPrecioCalculado),
+                accion: 'nuevo'
+            };
+
+            let response = await fetch('/periodos', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(datosImpuesto)
+            });
+            let respuesta = await response.json();
+            
+            if (respuesta.msg != "ok") {
+                alert("Error al guardar el período: " + respuesta.msg);
+            } else {
+                alert("Período de impuesto registrado correctamente.");
+                document.getElementById('frmImpuesto').reset();
+                document.getElementById('lblPrecioCalculado').innerText = "0.00";
+            }
+        });
+    </script>
+</body>
 </html>
