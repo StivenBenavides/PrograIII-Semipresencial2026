@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Iniciar sesión</title>
+    <link rel="stylesheet" href="/auth.css">
+</head>
+<body class="auth-page">
+    <main class="auth-card">
+        <div class="brand-mark" aria-hidden="true">U</div>
+        <p class="eyebrow">Sistema académico</p>
+        <h1 id="auth-title">Bienvenido</h1>
+        <p id="auth-intro" class="intro">Inicie sesión para continuar al sistema.</p>
+
+        <form id="login-form">
+            <label class="field">
+                <span>Usuario</span>
+                <input id="login-usuario" name="usuario" type="text" autocomplete="username"
+                       maxlength="35" placeholder="Ingrese su usuario" required autofocus>
+            </label>
+            <label class="field">
+                <span>Clave</span>
+                <input name="clave" type="password" autocomplete="current-password"
+                       maxlength="35" placeholder="Ingrese su clave" required>
+            </label>
+            <p id="login-message" class="form-message" role="status" aria-live="polite"></p>
+            <button id="login-button" type="submit">Iniciar sesión <span aria-hidden="true">→</span></button>
+            <button id="show-register" class="auth-switch" type="button">
+                ¿No tienes cuenta? <strong>Regístrate</strong>
+            </button>
+        </form>
+
+        <form id="register-form" hidden>
+            <label class="field">
+                <span>Usuario</span>
+                <input name="usuario" type="text" autocomplete="username"
+                       maxlength="35" placeholder="Elija un nombre de usuario" required>
+            </label>
+            <label class="field">
+                <span>Nombre completo</span>
+                <input name="nombre" type="text" autocomplete="name"
+                       maxlength="85" placeholder="Nombre y apellidos" required>
+            </label>
+            <label class="field">
+                <span>Dirección</span>
+                <input name="direccion" type="text" autocomplete="street-address"
+                       maxlength="100" placeholder="Dirección" required>
+            </label>
+            <label class="field">
+                <span>Teléfono <small>9 dígitos</small></span>
+                <input name="telefono" type="tel" inputmode="numeric" pattern="[0-9]{9}"
+                       maxlength="9" placeholder="Ej. 888812345" required>
+            </label>
+            <label class="field">
+                <span>Clave <small>Entre 8 y 35 caracteres</small></span>
+                <input name="clave" type="password" autocomplete="new-password"
+                       minlength="8" maxlength="35" placeholder="Elija una clave" required>
+            </label>
+            <p id="register-message" class="form-message" role="status" aria-live="polite"></p>
+            <button id="register-button" type="submit">Crear cuenta <span aria-hidden="true">→</span></button>
+            <button id="show-login" class="auth-switch" type="button">
+                ¿Ya tienes cuenta? <strong>Inicia sesión</strong>
+            </button>
+        </form>
+    </main>
+
+    <script>
+        const loginForm = document.querySelector("#login-form");
+        const registerForm = document.querySelector("#register-form");
+        const loginMessage = document.querySelector("#login-message");
+        const registerMessage = document.querySelector("#register-message");
+        const title = document.querySelector("#auth-title");
+        const intro = document.querySelector("#auth-intro");
+        const loginButton = document.querySelector("#login-button");
+        const registerButton = document.querySelector("#register-button");
+
+        function showLogin() {
+            loginForm.hidden = false;
+            registerForm.hidden = true;
+            title.textContent = "Bienvenido";
+            intro.textContent = "Inicie sesión para continuar al sistema.";
+            loginMessage.textContent = "";
+            loginMessage.classList.remove("error");
+            document.querySelector("#login-usuario").focus();
+        }
+
+        function showRegister() {
+            loginForm.hidden = true;
+            registerForm.hidden = false;
+            title.textContent = "Crear cuenta";
+            intro.textContent = "Complete sus datos para registrarse en el sistema.";
+            loginMessage.textContent = "";
+            registerMessage.textContent = "";
+            registerMessage.classList.remove("error");
+            registerForm.elements.usuario.focus();
+        }
+
+        document.querySelector("#show-register").addEventListener("click", showRegister);
+        document.querySelector("#show-login").addEventListener("click", showLogin);
+
+        loginForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            loginMessage.textContent = "";
+            loginMessage.classList.remove("error");
+            loginButton.disabled = true;
+
+            try {
+                const response = await fetch("/api/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(Object.fromEntries(new FormData(loginForm))),
+                });
+                const result = await response.json();
+                if (!response.ok || !result.ok) {
+                    loginMessage.textContent = result.msg || "No fue posible iniciar sesión.";
+                    loginMessage.classList.add("error");
+                    return;
+                }
+                window.location.assign("/usuarios.html");
+            } catch (error) {
+                loginMessage.textContent = "No se pudo conectar con el servidor. Intente de nuevo.";
+                loginMessage.classList.add("error");
+                console.error("Error al iniciar sesión:", error);
+            } finally {
+                loginButton.disabled = false;
+            }
+        });
+
+        registerForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            registerMessage.textContent = "";
+            registerMessage.classList.remove("error");
+            registerButton.disabled = true;
+
+            try {
+                const response = await fetch("/api/registro", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(Object.fromEntries(new FormData(registerForm))),
+                });
+                const result = await response.json();
+                if (!response.ok || !result.ok) {
+                    registerMessage.textContent = result.msg || "No fue posible crear la cuenta.";
+                    registerMessage.classList.add("error");
+                    return;
+                }
+
+                const usuario = registerForm.elements.usuario.value.trim();
+                registerForm.reset();
+                showLogin();
+                document.querySelector("#login-usuario").value = usuario;
+                loginMessage.textContent = result.msg;
+            } catch (error) {
+                registerMessage.textContent = "No se pudo conectar con el servidor. Intente de nuevo.";
+                registerMessage.classList.add("error");
+                console.error("Error al registrar usuario:", error);
+            } finally {
+                registerButton.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

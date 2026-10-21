@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Administrar usuarios</title>
+    <link rel="stylesheet" href="/auth.css">
+</head>
+<body>
+    <header class="topbar">
+        <a class="wordmark" href="/usuarios.html"><span>U</span> Sistema académico</a>
+        <button id="logout-button" class="button button-quiet" type="button">Cerrar sesión</button>
+    </header>
+
+    <main class="content">
+        <section class="page-heading">
+            <div>
+                <p class="eyebrow">Administración</p>
+                <h1>Usuarios</h1>
+                <p>Registre, busque y mantenga los usuarios del sistema.</p>
+            </div>
+        </section>
+
+        <div class="workspace">
+            <section class="panel">
+                <div class="panel-heading">
+                    <div>
+                        <h2 id="form-heading">Registrar usuario</h2>
+                        <p>Complete los datos solicitados.</p>
+                    </div>
+                </div>
+                <form id="usuario-form">
+                    <input id="idUsuario" name="idUsuario" type="hidden">
+                    <label class="field">
+                        <span>Nombre de usuario</span>
+                        <input id="usuario" name="usuario" type="text" maxlength="35"
+                               autocomplete="off" placeholder="Ej. ana.r" required>
+                    </label>
+                    <label class="field">
+                        <span>Nombre completo</span>
+                        <input id="nombre" name="nombre" type="text" maxlength="85"
+                               autocomplete="name" placeholder="Nombre y apellidos" required>
+                    </label>
+                    <label class="field">
+                        <span>Dirección</span>
+                        <input id="direccion" name="direccion" type="text" maxlength="100"
+                               autocomplete="street-address" placeholder="Dirección del usuario" required>
+                    </label>
+                    <label class="field">
+                        <span>Teléfono <small>9 dígitos</small></span>
+                        <input id="telefono" name="telefono" type="tel" inputmode="numeric"
+                               pattern="[0-9]{9}" maxlength="9" placeholder="Ej. 888812345" required>
+                    </label>
+                    <label class="field">
+                        <span>Clave <small id="clave-hint">Entre 8 y 35 caracteres</small></span>
+                        <input id="clave" name="clave" type="password" minlength="8" maxlength="35"
+                               autocomplete="new-password" placeholder="Mínimo 8 caracteres" required>
+                    </label>
+                    <p id="form-message" class="form-message" role="status" aria-live="polite"></p>
+                    <div class="form-actions">
+                        <button id="save-button" class="button button-primary" type="submit">
+                            Registrar usuario
+                        </button>
+                        <button id="cancel-button" class="button button-quiet" type="button" hidden>
+                            Cancelar edición
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="panel user-list">
+                <div class="panel-heading">
+                    <div>
+                        <h2>Buscar usuarios</h2>
+                        <p>Seleccione una fila para editar sus datos.</p>
+                    </div>
+                    <label class="search-field">
+                        <span class="visually-hidden">Buscar por usuario o nombre</span>
+                        <input id="buscar" type="search" placeholder="Buscar usuarios…"
+                               autocomplete="off">
+                    </label>
+                </div>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Nombre</th>
+                                <th>Dirección</th>
+                                <th>Teléfono</th>
+                                <th><span class="visually-hidden">Acciones</span></th>
+                            </tr>
+                        </thead>
+                        <tbody id="usuarios-table">
+                            <tr><td colspan="5" class="empty-state">Cargando usuarios…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        const form = document.querySelector("#usuario-form");
+        const table = document.querySelector("#usuarios-table");
+        const search = document.querySelector("#buscar");
+        const formMessage = document.querySelector("#form-message");
+        const saveButton = document.querySelector("#save-button");
+        const cancelButton = document.querySelector("#cancel-button");
+        const passwordInput = document.querySelector("#clave");
+        const formHeading = document.querySelector("#form-heading");
+        let searchTimeout;
+
+        function showMessage(text, isError = false) {
+            formMessage.textContent = text;
+            formMessage.classList.toggle("error", isError);
+        }
+
+        async function request(url, options = {}) {
+            const response = await fetch(url, options);
+            const result = await response.json();
+            if (response.status === 401) {
+                window.location.assign("/");
+                throw new Error("La sesión expiró.");
+            }
+            if (!response.ok || !result.ok) {
+                throw new Error(result.msg || "No se pudo completar la operación.");
+            }
+            return result;
+        }
+
+        async function loadUsers(term = "") {
+            table.replaceChildren();
+            const loading = document.createElement("tr");
+            const loadingCell = document.createElement("td");
+            loadingCell.colSpan = 5;
+            loadingCell.className = "empty-state";
+            loadingCell.textContent = "Cargando usuarios…";
+            loading.append(loadingCell);
+            table.append(loading);
+
+            try {
+                const result = await request(`/api/usuarios?buscar=${encodeURIComponent(term)}`);
+                table.replaceChildren();
+                if (!result.usuarios.length) {
+                    const row = document.createElement("tr");
+                    const cell = document.createElement("td");
+                    cell.colSpan = 5;
+                    cell.className = "empty-state";
+                    cell.textContent = "No se encontraron usuarios.";
+                    row.append(cell);
+                    table.append(row);
+                    return;
+                }
+
+                for (const usuario of result.usuarios) {
+                    const row = document.createElement("tr");
+                    for (const value of [
+                        usuario.usuario,
+                        usuario.nombre,
+                        usuario.direccion,
+                        usuario.telefono,
+                    ]) {
+                        const cell = document.createElement("td");
+                        cell.textContent = value;
+                        row.append(cell);
+                    }
+
+                    const actions = document.createElement("td");
+                    actions.className = "row-actions";
+                    const editButton = document.createElement("button");
+                    editButton.type = "button";
+                    editButton.className = "button button-small button-quiet";
+                    editButton.textContent = "Editar";
+                    editButton.addEventListener("click", () => editUser(usuario));
+                    const deleteButton = document.createElement("button");
+                    deleteButton.type = "button";
+                    deleteButton.className = "button button-small button-danger";
+                    deleteButton.textContent = "Eliminar";
+                    deleteButton.addEventListener("click", () => deleteUser(usuario));
+                    actions.append(editButton, deleteButton);
+                    row.append(actions);
+                    table.append(row);
+                }
+            } catch (error) {
+                table.replaceChildren();
+                const row = document.createElement("tr");
+                const cell = document.createElement("td");
+                cell.colSpan = 5;
+                cell.className = "empty-state error";
+                cell.textContent = error.message;
+                row.append(cell);
+                table.append(row);
+            }
+        }
+
+        function editUser(user) {
+            document.querySelector("#idUsuario").value = user.idUsuario;
+            document.querySelector("#usuario").value = user.usuario;
+            document.querySelector("#nombre").value = user.nombre;
+            document.querySelector("#direccion").value = user.direccion;
+            document.querySelector("#telefono").value = user.telefono;
+            passwordInput.value = "";
+            passwordInput.required = false;
+            passwordInput.placeholder = "Dejar en blanco para conservarla";
+            document.querySelector("#clave-hint").textContent = "Opcional al editar";
+            formHeading.textContent = "Editar usuario";
+            saveButton.textContent = "Guardar cambios";
+            cancelButton.hidden = false;
+            showMessage("");
+            document.querySelector("#usuario").focus();
+        }
+
+        function resetForm() {
+            form.reset();
+            document.querySelector("#idUsuario").value = "";
+            passwordInput.required = true;
+            passwordInput.placeholder = "Mínimo 8 caracteres";
+            document.querySelector("#clave-hint").textContent = "Entre 8 y 35 caracteres";
+            formHeading.textContent = "Registrar usuario";
+            saveButton.textContent = "Registrar usuario";
+            cancelButton.hidden = true;
+            showMessage("");
+        }
+
+        async function deleteUser(user) {
+            if (!window.confirm(`¿Eliminar al usuario "${user.usuario}"?`)) return;
+            try {
+                const result = await request("/api/usuarios", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ accion: "eliminar", idUsuario: user.idUsuario }),
+                });
+                showMessage(result.msg);
+                if (document.querySelector("#idUsuario").value === String(user.idUsuario)) {
+                    resetForm();
+                }
+                await loadUsers(search.value);
+            } catch (error) {
+                showMessage(error.message, true);
+            }
+        }
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            saveButton.disabled = true;
+            showMessage("");
+            const datos = Object.fromEntries(new FormData(form));
+            datos.accion = datos.idUsuario ? "modificar" : "nuevo";
+
+            try {
+                const result = await request("/api/usuarios", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(datos),
+                });
+                resetForm();
+                showMessage(result.msg);
+                await loadUsers(search.value);
+            } catch (error) {
+                showMessage(error.message, true);
+            } finally {
+                saveButton.disabled = false;
+            }
+        });
+
+        cancelButton.addEventListener("click", resetForm);
+        search.addEventListener("input", () => {
+            window.clearTimeout(searchTimeout);
+            searchTimeout = window.setTimeout(() => loadUsers(search.value), 200);
+        });
+
+        document.querySelector("#logout-button").addEventListener("click", async () => {
+            try {
+                await request("/api/logout", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: "{}",
+                });
+                window.location.assign("/");
+            } catch (error) {
+                showMessage(error.message, true);
+            }
+        });
+
+        loadUsers();
+    </script>
+</body>
+</html>
