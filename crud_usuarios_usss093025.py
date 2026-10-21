@@ -173,7 +173,7 @@ class crud_usuarios_usss093025:
     def _validar_datos(datos):
         campos = ("usuario", "nombre", "direccion", "telefono")
         valores = {}
-        limites = {"usuario": 35, "nombre": 85, "direccion": 100}
+        limites = {"usuario": 35, "nombre": 85, "direccion": 100, "telefono": 9}
         for campo in campos:
             valor = datos.get(campo)
             if not isinstance(valor, str) or not valor.strip():
@@ -183,8 +183,11 @@ class crud_usuarios_usss093025:
                 raise ValueError(f"El campo {campo} supera la longitud permitida.")
             valores[campo] = valor
 
-        if not re.fullmatch(r"[0-9]{9}", valores["telefono"]):
-            raise ValueError("El teléfono debe contener exactamente 9 dígitos.")
+        if not re.fullmatch(r"[0-9]{4}-?[0-9]{4}", valores["telefono"]):
+            raise ValueError(
+                "El teléfono debe contener 8 dígitos; se permite un guion después del cuarto."
+            )
+        valores["telefono"] = valores["telefono"].replace("-", "")
         return tuple(valores[campo] for campo in campos)
 
     @staticmethod

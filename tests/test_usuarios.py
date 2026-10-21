@@ -36,7 +36,7 @@ class PruebasCrudUsuarios(unittest.TestCase):
                 "clave": "clave-segura-123",
                 "nombre": "Ana Rodríguez",
                 "direccion": "Calle 1",
-                "telefono": "888812345",
+                "telefono": "3883-8383",
             }
         )
 
@@ -45,6 +45,7 @@ class PruebasCrudUsuarios(unittest.TestCase):
         sql, valores = db.ejecuciones[0]
         self.assertIn("INSERT INTO usuarios_usss093025", sql)
         self.assertEqual(valores[0], "ana")
+        self.assertEqual(valores[-1], "38838383")
         self.assertTrue(_verificar_hash("clave-segura-123", valores[1]))
 
     def test_registro_rechaza_nombre_de_usuario_existente(self):
@@ -57,7 +58,7 @@ class PruebasCrudUsuarios(unittest.TestCase):
                     "clave": "clave-segura-123",
                     "nombre": "Ana",
                     "direccion": "Calle 1",
-                    "telefono": "888812345",
+                    "telefono": "88812345",
                 }
             )
         self.assertEqual(db.ejecuciones, [])
@@ -72,7 +73,7 @@ class PruebasCrudUsuarios(unittest.TestCase):
                 "clave": "clave-segura-123",
                 "nombre": "Ana Rodríguez",
                 "direccion": "Calle 1",
-                "telefono": "888812345",
+                "telefono": "88812345",
             }
         )
 
@@ -112,7 +113,7 @@ class PruebasCrudUsuarios(unittest.TestCase):
         self.assertNotIn(termino, sql)
         self.assertEqual(parametros, (f"%{termino}%", f"%{termino}%"))
 
-    def test_telefono_debe_tener_nueve_digitos(self):
+    def test_telefono_rechaza_nueve_digitos(self):
         crud = crud_usuarios_usss093025(BaseDatosFalsa())
         with self.assertRaises(ValueError):
             crud.administrar(
@@ -122,7 +123,7 @@ class PruebasCrudUsuarios(unittest.TestCase):
                     "clave": "clave-segura-123",
                     "nombre": "Ana",
                     "direccion": "Calle 1",
-                    "telefono": "1234-5678",
+                    "telefono": "888812345",
                 }
             )
 
@@ -138,7 +139,7 @@ class PruebasCrudUsuarios(unittest.TestCase):
                 "clave": "",
                 "nombre": "Ana Rodríguez",
                 "direccion": "Calle 2",
-                "telefono": "888812345",
+                "telefono": "88812345",
             }
         )
 
@@ -167,7 +168,7 @@ class UsuariosFalsos:
 
     def consultar(self, buscar=""):
         return [{"idUsuario": 1, "usuario": "ana", "nombre": "Ana",
-                 "direccion": "Calle 1", "telefono": "888812345"}]
+                 "direccion": "Calle 1", "telefono": "88812345"}]
 
     def autenticar(self, usuario, clave):
         return usuario == "ana" and clave == "clave"
@@ -235,7 +236,7 @@ class PruebasServidor(unittest.TestCase):
                 "clave": "clave-segura",
                 "nombre": "Nueva Cuenta",
                 "direccion": "Calle 2",
-                "telefono": "888812346",
+                "telefono": "88812346",
             },
         )
         self.assertEqual(estado, 201)

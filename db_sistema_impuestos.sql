@@ -33,7 +33,7 @@ CREATE TABLE `usuarios_usss093025` (
   `clave` char(35) NOT NULL,
   `nombre` char(85) NOT NULL,
   `direccion` char(100) NOT NULL,
-  `telefono` char(9) NOT NULL
+  `telefono` char(8) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -41,8 +41,8 @@ CREATE TABLE `usuarios_usss093025` (
 --
 
 INSERT INTO `usuarios_usss093025` (`idUsuario`, `usuario`, `clave`, `nombre`, `direccion`, `telefono`) VALUES
-(1, 'Stiven', '1$sw31XbiHRg_Ldw$iM79C1OkuL4VvlO3SA', 'Stiven Benavides', 'usu', '234567890'),
-(2, 'Luis', '1$Au4VqHvgDw6WQg$orTx4hWcrKMB3FY2vQ', 'Luisusu', 'ereguayquin', '456789098');
+(1, 'Stiven', '1$sw31XbiHRg_Ldw$iM79C1OkuL4VvlO3SA', 'Stiven Benavides', 'usu', '23456789'),
+(2, 'Luis', '1$Au4VqHvgDw6WQg$orTx4hWcrKMB3FY2vQ', 'Luisusu', 'ereguayquin', '45678909');
 
 --
 -- Índices para tablas volcadas

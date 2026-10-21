@@ -47,9 +47,10 @@
                                autocomplete="street-address" placeholder="Dirección del usuario" required>
                     </label>
                     <label class="field">
-                        <span>Teléfono <small>9 dígitos</small></span>
-                        <input id="telefono" name="telefono" type="tel" inputmode="numeric"
-                               pattern="[0-9]{9}" maxlength="9" placeholder="Ej. 888812345" required>
+                        <span>Teléfono <small>8 dígitos</small></span>
+                        <input id="telefono" name="telefono" type="tel" inputmode="tel"
+                               pattern="[0-9]{4}-?[0-9]{4}" maxlength="9"
+                               placeholder="Ej. 3883-8383" required>
                     </label>
                     <label class="field">
                         <span>Clave <small id="clave-hint">Entre 8 y 35 caracteres</small></span>
